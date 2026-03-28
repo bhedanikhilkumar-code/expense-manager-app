@@ -4,51 +4,71 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const TransactionContext = createContext();
 
 const STORAGE_KEY = '@transactions';
+const THEME_KEY = '@app_theme';
 
 export const TransactionProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All'); // 'All', 'Today', 'Week', 'Month'
 
-  // Load transactions from AsyncStorage on initial mount
+  // Load data from AsyncStorage on initial mount
   useEffect(() => {
-    const loadTransactions = async () => {
+    const loadData = async () => {
       try {
-        const storedTransactions = await AsyncStorage.getItem(STORAGE_KEY);
+        const [storedTransactions, storedTheme] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(THEME_KEY)
+        ]);
+        
         if (storedTransactions) {
           setTransactions(JSON.parse(storedTransactions));
         } else {
-          // Default initial data if none exists
+          // Default initial data
           const initialData = [
-            { id: '1', title: 'Salary', amount: 50000, type: 'income', category: 'Work', date: '2026-03-20' },
-            { id: '2', title: 'Grocery', amount: 2500, type: 'expense', category: 'Food', date: '2026-03-21' },
-            { id: '3', title: 'Petrol', amount: 1200, type: 'expense', category: 'Transport', date: '2026-03-22' },
+            { id: '1', title: 'Salary', amount: 50000, type: 'income', category: 'Salary', date: new Date().toISOString() },
+            { id: '2', title: 'Grocery', amount: 2500, type: 'expense', category: 'Food', date: new Date().toISOString() },
+            { id: '3', title: 'Petrol', amount: 1200, type: 'expense', category: 'Transport', date: new Date().toISOString() },
+            { id: '4', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: new Date().toISOString() },
+            { id: '5', title: 'Internet', amount: 800, type: 'expense', category: 'Utilities', date: new Date().toISOString() },
+            { id: '6', title: 'Gym', amount: 1500, type: 'expense', category: 'Health', date: new Date().toISOString() },
+            { id: '7', title: 'Dining Out', amount: 1200, type: 'expense', category: 'Food', date: new Date().toISOString() },
           ];
           setTransactions(initialData);
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
         }
+
+        if (storedTheme) {
+          setIsDarkMode(JSON.parse(storedTheme));
+        }
       } catch (error) {
-        console.error('Failed to load transactions:', error);
+        console.error('Failed to load data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadTransactions();
+    loadData();
   }, []);
 
-  // Save transactions whenever they change
+  // Save data whenever it changes
   useEffect(() => {
-    const saveTransactions = async () => {
+    const saveData = async () => {
       if (!loading) {
         try {
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+          await Promise.all([
+            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)),
+            AsyncStorage.setItem(THEME_KEY, JSON.stringify(isDarkMode))
+          ]);
         } catch (error) {
-          console.error('Failed to save transactions:', error);
+          console.error('Failed to save data:', error);
         }
       }
     };
-    saveTransactions();
-  }, [transactions, loading]);
+    saveData();
+  }, [transactions, isDarkMode, loading]);
+
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   const addTransaction = (transaction) => {
     setTransactions(prev => [
@@ -61,25 +81,77 @@ export const TransactionProvider = ({ children }) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
   };
 
-  const totalIncome = transactions
+  // Filtering Logic
+  const getFilteredTransactions = () => {
+    const now = new Date();
+    return transactions.filter(t => {
+      const tDate = new Date(t.date);
+      if (activeFilter === 'Today') {
+        return tDate.toDateString() === now.toDateString();
+      } else if (activeFilter === 'Week') {
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return tDate >= oneWeekAgo;
+      } else if (activeFilter === 'Month') {
+        return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+      }
+      return true; // 'All'
+    });
+  };
+
+  const filteredData = getFilteredTransactions();
+
+  const totalIncome = filteredData
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-  const totalExpense = transactions
+  const totalExpense = filteredData
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const balance = totalIncome - totalExpense;
 
+  // Spending by category (for chart)
+  const getSpendingByCategory = () => {
+    const categories = {};
+    filteredData
+      .filter(t => t.type === 'expense')
+      .forEach(t => {
+        categories[t.category] = (categories[t.category] || 0) + t.amount;
+      });
+    return Object.keys(categories).map(name => ({
+      name,
+      amount: categories[name],
+      color: `#${Math.floor(Math.random()*16777215).toString(16)}` // Random color
+    }));
+  };
+
+  const theme = {
+    background: isDarkMode ? '#121212' : '#F8F9FA',
+    card: isDarkMode ? '#1E1E1E' : '#FFFFFF',
+    text: isDarkMode ? '#FFFFFF' : '#202124',
+    subText: isDarkMode ? '#B0B0B0' : '#5F6368',
+    primary: '#1A73E8',
+    income: '#34A853',
+    expense: '#EA4335',
+    border: isDarkMode ? '#333333' : '#DADCE0'
+  };
+
   return (
     <TransactionContext.Provider value={{ 
-      transactions, 
+      transactions: filteredData, 
+      allTransactions: transactions,
       addTransaction, 
       deleteTransaction,
       totalIncome, 
       totalExpense, 
       balance,
-      loading 
+      loading,
+      isDarkMode,
+      toggleTheme,
+      activeFilter,
+      setActiveFilter,
+      getSpendingByCategory,
+      theme
     }}>
       {children}
     </TransactionContext.Provider>

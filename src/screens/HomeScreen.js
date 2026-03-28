@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ActivityIndicator, TextInput } from 'react-native';
-import { Plus, Search, X } from 'lucide-react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ActivityIndicator, TextInput, ScrollView } from 'react-native';
+import { Plus, Search, X, Moon, Sun } from 'lucide-react-native';
 import { useTransactions } from '../context/TransactionContext';
 import BalanceCard from '../components/BalanceCard';
 import TransactionItem from '../components/TransactionItem';
+import AnalyticsChart from '../components/AnalyticsChart';
 
 const HomeScreen = ({ navigation }) => {
-  const { transactions, balance, totalIncome, totalExpense, deleteTransaction, loading } = useTransactions();
+  const { 
+    transactions, balance, totalIncome, totalExpense, deleteTransaction, 
+    loading, theme, isDarkMode, toggleTheme, activeFilter, setActiveFilter 
+  } = useTransactions();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
+
+  const filters = ['All', 'Today', 'Week', 'Month'];
 
   const filteredTransactions = transactions.filter(t => {
     const title = String(t.title || '').toLowerCase();
@@ -19,31 +26,37 @@ const HomeScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#1A73E8" />
+      <View style={[styles.loaderContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         {!isSearchActive ? (
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.greeting}>Namaste! 🙏</Text>
-              <Text style={styles.subGreeting}>Aapka aaj ka kharcha yahan hai.</Text>
+              <Text style={[styles.greeting, { color: theme.text }]}>Namaste! 🙏</Text>
+              <Text style={[styles.subGreeting, { color: theme.subText }]}>Aapka aaj ka kharcha yahan hai.</Text>
             </View>
-            <TouchableOpacity onPress={() => setIsSearchActive(true)} style={styles.iconBtn}>
-              <Search size={24} color="#5F6368" />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity onPress={toggleTheme} style={[styles.iconBtn, { backgroundColor: theme.card, marginRight: 10 }]}>
+                {isDarkMode ? <Sun size={24} color="#FFD700" /> : <Moon size={24} color="#5F6368" />}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsSearchActive(true)} style={[styles.iconBtn, { backgroundColor: theme.card }]}>
+                <Search size={24} color={theme.subText} />
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (
-          <View style={styles.searchBar}>
-            <Search size={20} color="#5F6368" style={{ marginRight: 10 }} />
+          <View style={[styles.searchBar, { backgroundColor: theme.card }]}>
+            <Search size={20} color={theme.subText} style={{ marginRight: 10 }} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: theme.text }]}
               placeholder="Search transactions..."
+              placeholderTextColor={theme.subText}
               value={searchQuery}
               onChangeText={setSearchQuery}
               autoFocus
@@ -52,48 +65,65 @@ const HomeScreen = ({ navigation }) => {
               setIsSearchActive(false);
               setSearchQuery('');
             }}>
-              <X size={20} color="#5F6368" />
+              <X size={20} color={theme.subText} />
             </TouchableOpacity>
           </View>
         )}
       </View>
 
-      <BalanceCard 
-        balance={balance}
-        income={totalIncome}
-        expense={totalExpense}
-      />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <BalanceCard 
+          balance={balance}
+          income={totalIncome}
+          expense={totalExpense}
+        />
 
-      <View style={styles.transactionListHeader}>
-        <Text style={styles.sectionTitle}>
-          {isSearchActive ? 'Search Results' : 'Recent Transactions'}
-        </Text>
-        {!isSearchActive && (
-          <TouchableOpacity>
-            <Text style={styles.seeAll}>See All</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+        <View style={styles.filterRow}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20 }}>
+            {filters.map((f) => (
+              <TouchableOpacity 
+                key={f}
+                style={[
+                  styles.filterChip, 
+                  { backgroundColor: activeFilter === f ? theme.primary : theme.card }
+                ]}
+                onPress={() => setActiveFilter(f)}
+              >
+                <Text style={[
+                  styles.filterText, 
+                  { color: activeFilter === f ? '#FFF' : theme.subText }
+                ]}>{f}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-      <FlatList
-        data={filteredTransactions}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TransactionItem item={item} onDelete={deleteTransaction} />
-        )}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              {searchQuery ? 'No matching transactions found.' : 'No transactions yet. Start adding some!'}
-            </Text>
-          </View>
-        }
-      />
+        {!isSearchActive && <AnalyticsChart />}
+
+        <View style={styles.transactionListHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>
+            {isSearchActive ? 'Search Results' : 'Recent Transactions'}
+          </Text>
+        </View>
+
+        <View style={styles.listContainer}>
+          {filteredTransactions.length > 0 ? (
+            filteredTransactions.map(item => (
+              <TransactionItem key={item.id} item={item} onDelete={deleteTransaction} />
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={[styles.emptyText, { color: theme.subText }]}>
+                {searchQuery ? 'No matching transactions found.' : 'No transactions yet. Start adding some!'}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View style={{ height: 100 }} />
+      </ScrollView>
 
       <TouchableOpacity 
-        style={styles.fab}
+        style={[styles.fab, { backgroundColor: theme.primary, shadowColor: theme.primary }]}
         onPress={() => navigation.navigate('AddTransaction')}
       >
         <Plus color="#FFF" size={32} />
@@ -103,22 +133,25 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  container: { flex: 1 },
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 10 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  greeting: { fontSize: 24, fontWeight: 'bold', color: '#202124' },
-  subGreeting: { fontSize: 14, color: '#5F6368', marginTop: 4 },
-  iconBtn: { padding: 8, backgroundColor: '#FFF', borderRadius: 12, elevation: 1 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, elevation: 2 },
-  searchInput: { flex: 1, fontSize: 16, color: '#202124' },
-  transactionListHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginTop: 10, marginBottom: 15 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#202124' },
-  seeAll: { color: '#1A73E8', fontWeight: '600' },
-  listContainer: { paddingHorizontal: 20, paddingBottom: 100 },
+  headerActions: { flexDirection: 'row' },
+  greeting: { fontSize: 24, fontWeight: 'bold' },
+  subGreeting: { fontSize: 14, marginTop: 4 },
+  iconBtn: { padding: 10, borderRadius: 14, elevation: 1 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, elevation: 2 },
+  searchInput: { flex: 1, fontSize: 16 },
+  filterRow: { marginTop: 20, marginBottom: 5 },
+  filterChip: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, marginRight: 10, elevation: 1 },
+  filterText: { fontSize: 14, fontWeight: '600' },
+  transactionListHeader: { paddingHorizontal: 20, marginTop: 25, marginBottom: 15 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold' },
+  listContainer: { paddingHorizontal: 20 },
   emptyContainer: { alignItems: 'center', marginTop: 50 },
-  emptyText: { color: '#70757A', fontSize: 16 },
-  fab: { position: 'absolute', bottom: 30, right: 30, backgroundColor: '#1A73E8', width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#1A73E8', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+  emptyText: { fontSize: 16 },
+  fab: { position: 'absolute', bottom: 30, right: 30, width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
 });
 
 export default HomeScreen;

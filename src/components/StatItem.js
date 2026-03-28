@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const StatItem = ({ icon, label, value, iconBgColor, valueColor = '#FFF' }) => (
+const StatItem = ({ icon, label, value, iconBgColor, valueColor = '#FFF', labelColor = 'rgba(255, 255, 255, 0.7)' }) => (
   <View style={styles.statItem}>
     <View style={[styles.statIconWrapper, { backgroundColor: iconBgColor }]}>
       {icon}
     </View>
     <View>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={[styles.statLabel, { color: labelColor }]}>{label}</Text>
       <Text style={[styles.statValue, { color: valueColor }]}>{value}</Text>
     </View>
   </View>

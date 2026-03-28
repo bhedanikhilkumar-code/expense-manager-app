@@ -2,30 +2,41 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { TrendingUp, TrendingDown, Trash2 } from 'lucide-react-native';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { useTransactions } from '../context/TransactionContext';
 
-const TransactionItem = ({ item, onDelete }) => (
-  <View style={styles.transactionCard}>
-    <View style={[styles.iconContainer, { backgroundColor: item.type === 'income' ? '#E6F4EA' : '#FCE8E6' }]}>
-      {item.type === 'income' ? <TrendingUp size={20} color="#1E8E3E" /> : <TrendingDown size={20} color="#D93025" />}
-    </View>
-    <View style={styles.transactionDetails}>
-      <Text style={styles.transactionTitle}>{item.title}</Text>
-      <View style={styles.subInfo}>
-        <Text style={styles.transactionCategory}>{item.category}</Text>
-        <Text style={styles.dot}> • </Text>
-        <Text style={styles.transactionDate}>{formatDate(item.date)}</Text>
+const TransactionItem = ({ item, onDelete }) => {
+  const { theme, isDarkMode } = useTransactions();
+  
+  const isIncome = item.type === 'income';
+  const iconBg = isIncome 
+    ? (isDarkMode ? '#1B3320' : '#E6F4EA') 
+    : (isDarkMode ? '#3C1E1E' : '#FCE8E6');
+  const iconColor = isIncome ? '#34A853' : '#EA4335';
+
+  return (
+    <View style={[styles.transactionCard, { backgroundColor: theme.card }]}>
+      <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
+        {isIncome ? <TrendingUp size={20} color={iconColor} /> : <TrendingDown size={20} color={iconColor} />}
+      </View>
+      <View style={styles.transactionDetails}>
+        <Text style={[styles.transactionTitle, { color: theme.text }]}>{item.title}</Text>
+        <View style={styles.subInfo}>
+          <Text style={[styles.transactionCategory, { color: theme.subText }]}>{item.category}</Text>
+          <Text style={[styles.dot, { color: theme.border }]}> • </Text>
+          <Text style={[styles.transactionDate, { color: theme.subText }]}>{formatDate(item.date)}</Text>
+        </View>
+      </View>
+      <View style={styles.rightContent}>
+        <Text style={[styles.transactionAmount, { color: iconColor }]}>
+          {isIncome ? '+' : '-'} {formatCurrency(item.amount)}
+        </Text>
+        <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteBtn}>
+          <Trash2 size={16} color={theme.subText} />
+        </TouchableOpacity>
       </View>
     </View>
-    <View style={styles.rightContent}>
-      <Text style={[styles.transactionAmount, { color: item.type === 'income' ? '#1E8E3E' : '#D93025' }]}>
-        {item.type === 'income' ? '+' : '-'} {formatCurrency(item.amount)}
-      </Text>
-      <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteBtn}>
-        <Trash2 size={16} color="#70757A" />
-      </TouchableOpacity>
-    </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   transactionCard: { 

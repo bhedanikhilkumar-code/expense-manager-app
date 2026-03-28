@@ -10,7 +10,7 @@ Write-Host ""
 Write-Host "1. Initializing Git repository (if not already done)..."
 git init | Out-Null
 
-Write-Host "2. Creating structured, logical commits..."
+Write-Host "2. Creating structured, logical, Pro-level commits..."
 
 # Remove from index just in case anything was already staged
 git reset | Out-Null
@@ -32,22 +32,22 @@ if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
 # Commit 3: Utilities and Context
 git add src/utils/ src/context/
 if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
-    git commit -m "feat: add core utilities and state management context" | Out-Null
-    Write-Host "  -> Committed utilities and context."
+    git commit -m "feat: add core utilities and transaction context with Theme Engine" | Out-Null
+    Write-Host "  -> Committed utilities and context (Theme Engine, Filters)."
 }
 
 # Commit 4: Components
 git add src/components/
 if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
-    git commit -m "feat: build reusable UI components (BalanceCard, StatItem, etc.)" | Out-Null
-    Write-Host "  -> Committed UI components."
+    git commit -m "feat: build reusable UI components (BalanceCard, AnalyticsChart, TransactionItem)" | Out-Null
+    Write-Host "  -> Committed UI components including Analytics Chart."
 }
 
 # Commit 5: Screens
 git add src/screens/
 if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
-    git commit -m "feat: implement main application screens (Home, AddTransaction)" | Out-Null
-    Write-Host "  -> Committed main screens."
+    git commit -m "feat: implement main application screens with Dark Mode support" | Out-Null
+    Write-Host "  -> Committed main screens with Dark Mode and Filters."
 }
 
 # Commit 6: Entry Points
@@ -58,21 +58,21 @@ if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
 }
 
 # Commit 7: Documentation
-git add README.md
+git add README.md LICENSE
 if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
-    git commit -m "docs: add comprehensive README with features and setup guide" | Out-Null
-    Write-Host "  -> Committed README.md."
+    git commit -m "docs: add comprehensive README and MIT license" | Out-Null
+    Write-Host "  -> Committed README.md and LICENSE."
 }
 
-# Any remaining files
+# Commit 8: Final Polish
 git add .
 if ((git status --porcelain | Select-String -Pattern "^[A-Z]") -ne $null) {
-    git commit -m "chore: add remaining miscellaneous files" | Out-Null
-    Write-Host "  -> Committed remaining files."
+    git commit -m "feat: complete professional expense manager with Analytics and Dark Mode" | Out-Null
+    Write-Host "  -> Committed final polish and premium features."
 }
 
 Write-Host ""
-Write-Host "All files have been committed with descriptive messages!"
+Write-Host "All files have been committed with descriptive Pro messages!"
 Write-Host ""
 Write-Host "3. Pushing to GitHub..."
 

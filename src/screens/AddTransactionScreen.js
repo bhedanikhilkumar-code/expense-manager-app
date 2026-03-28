@@ -12,7 +12,7 @@ const AddTransactionScreen = ({ navigation }) => {
   const [type, setType] = useState('expense');
   const [category, setCategory] = useState(EXPENSE_CATEGORIES[0]);
   
-  const { addTransaction } = useTransactions();
+  const { addTransaction, theme, isDarkMode } = useTransactions();
 
   const handleTypeChange = (newType) => {
     setType(newType);
@@ -33,43 +33,56 @@ const AddTransactionScreen = ({ navigation }) => {
   const categories = type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <ChevronLeft size={28} color="#202124" />
+          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: theme.card }]}>
+            <ChevronLeft size={28} color={theme.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Add Transaction</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Add Transaction</Text>
           <View style={{ width: 40 }} />
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.form}>
-            <Text style={styles.label}>Transaction Type</Text>
-            <View style={styles.typeContainer}>
+            <Text style={[styles.label, { color: theme.subText }]}>Transaction Type</Text>
+            <View style={[styles.typeContainer, { backgroundColor: theme.card }]}>
               <TouchableOpacity 
-                style={[styles.typeButton, type === 'expense' && styles.activeExpense]}
+                style={[
+                  styles.typeButton, 
+                  type === 'expense' && (isDarkMode ? { backgroundColor: '#3C1E1E' } : styles.activeExpense)
+                ]}
                 onPress={() => handleTypeChange('expense')}
               >
-                <Text style={[styles.typeText, type === 'expense' && styles.activeTypeText]}>Expense</Text>
+                <Text style={[
+                  styles.typeText, 
+                  { color: type === 'expense' ? theme.expense : theme.subText }
+                ]}>Expense</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[styles.typeButton, type === 'income' && styles.activeIncome]}
+                style={[
+                  styles.typeButton, 
+                  type === 'income' && (isDarkMode ? { backgroundColor: '#1B3320' } : styles.activeIncome)
+                ]}
                 onPress={() => handleTypeChange('income')}
               >
-                <Text style={[styles.typeText, type === 'income' && styles.activeTypeText]}>Income</Text>
+                <Text style={[
+                  styles.typeText, 
+                  { color: type === 'income' ? theme.income : theme.subText }
+                ]}>Income</Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.label}>Amount</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.currencySymbol}>₹</Text>
+            <Text style={[styles.label, { color: theme.subText }]}>Amount</Text>
+            <View style={[styles.inputWrapper, { borderBottomColor: theme.primary }]}>
+              <Text style={[styles.currencySymbol, { color: theme.text }]}>₹</Text>
               <TextInput
-                style={styles.amountInput}
+                style={[styles.amountInput, { color: theme.text }]}
                 placeholder="0"
+                placeholderTextColor={theme.subText}
                 keyboardType="numeric"
                 value={amount}
                 onChangeText={setAmount}
@@ -77,33 +90,39 @@ const AddTransactionScreen = ({ navigation }) => {
               />
             </View>
 
-            <Text style={styles.label}>Category</Text>
+            <Text style={[styles.label, { color: theme.subText }]}>Category</Text>
             <View style={styles.categoryContainer}>
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat}
                   style={[
                     styles.categoryChip,
-                    category === cat && (type === 'expense' ? styles.chipActiveExpense : styles.chipActiveIncome)
+                    { backgroundColor: theme.card },
+                    category === cat && (type === 'expense' ? (isDarkMode ? { backgroundColor: '#3C1E1E' } : styles.chipActiveExpense) : (isDarkMode ? { backgroundColor: '#1B3320' } : styles.chipActiveIncome))
                   ]}
                   onPress={() => setCategory(cat)}
                 >
-                  <Text style={[styles.categoryChipText, category === cat && styles.categoryChipTextActive]}>
+                  <Text style={[
+                    styles.categoryChipText, 
+                    { color: theme.subText },
+                    category === cat && { color: type === 'expense' ? theme.expense : theme.income, fontWeight: 'bold' }
+                  ]}>
                     {cat}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={styles.label}>What was it for?</Text>
+            <Text style={[styles.label, { color: theme.subText }]}>What was it for?</Text>
             <TextInput
-              style={styles.titleInput}
+              style={[styles.titleInput, { borderBottomColor: theme.border, color: theme.text }]}
               placeholder="e.g. Dinner, Rent, Bonus"
+              placeholderTextColor={theme.subText}
               value={title}
               onChangeText={setTitle}
             />
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <TouchableOpacity style={[styles.saveButton, { backgroundColor: theme.primary }]} onPress={handleSave}>
               <Save size={20} color="#FFF" style={{ marginRight: 10 }} />
               <Text style={styles.saveButtonText}>Save Transaction</Text>
             </TouchableOpacity>
