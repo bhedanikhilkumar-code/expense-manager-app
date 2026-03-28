@@ -10,10 +10,12 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
 
-  const filteredTransactions = transactions.filter(t => 
-    t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTransactions = transactions.filter(t => {
+    const title = String(t.title || '').toLowerCase();
+    const category = String(t.category || '').toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return title.includes(query) || category.includes(query);
+  });
 
   if (loading) {
     return (
