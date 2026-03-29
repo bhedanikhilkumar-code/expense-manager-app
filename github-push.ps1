@@ -1,6 +1,6 @@
 # github-push.ps1
 $ErrorActionPreference = "Stop"
-cd "C:\Users\bheda\Music\Desktop\Gemini CLI\expense-manager-app"
+Set-Location $PSScriptRoot
 
 Write-Host "====================================="
 Write-Host "  Expense Manager App - GitHub Push  "
