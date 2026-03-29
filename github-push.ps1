@@ -88,7 +88,20 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
         
         # Create repo and push
         gh repo create expense-manager-app --public --source=. --remote=origin --push
-        $username = "bhedanikhilkumar-code"
+        $username = gh api user --jq '.login' 2>$null
+        if (-not $username) {
+            $remoteUrl = git remote get-url origin 2>$null
+            if ($remoteUrl -match 'github\.com[:/](.+?)/') {
+                $username = $Matches[1]
+            }
+        }
+        if (-not $username) {
+            $username = Read-Host "Please enter your GitHub username"
+            if (-not $username) {
+                Write-Error "GitHub username cannot be empty."
+                exit 1
+            }
+        }
         $repoUrl = "https://github.com/$username/expense-manager-app"
         Write-Host ""
         Write-Host "====================================="
@@ -99,11 +112,12 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
         Write-Host "Error creating or pushing repository using GitHub CLI. Make sure you are logged in (run 'gh auth login')."
     }
 } else {
+    $username = Read-Host "Enter your GitHub username"
     Write-Host "GitHub CLI (gh) not found on your system."
     Write-Host "Please create a new repository manually on GitHub (https://github.com/new) named 'expense-manager-app'."
     Write-Host "Then, run the following commands in this folder to push your code:"
     Write-Host ""
-    Write-Host "  git remote add origin https://github.com/bhedanikhilkumar-code/expense-manager-app.git"
+    Write-Host "  git remote add origin https://github.com/$username/expense-manager-app.git"
     Write-Host "  git push -u origin main"
     Write-Host ""
 }

@@ -53,9 +53,18 @@ A sleek, modern, and highly intuitive Expense Management application built with 
 
 ## 📦 Distribution
 
-To generate a production-ready APK for Android, ensure you have [EAS CLI](https://docs.expo.dev/build/setup/) installed and run:
+To generate a production-ready APK for Android, use the appropriate build script for your platform:
+
+**Windows:**
 ```bash
-./build-apk.bat
+npm run build:apk          # Debug build
+npm run build:apk-release  # Release build
+```
+
+**macOS / Linux:**
+```bash
+npm run build:apk:unix          # Debug build
+npm run build:apk-release:unix  # Release build
 ```
 
 ## 📄 License
