@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { TrendingUp, TrendingDown, Trash2 } from 'lucide-react-native';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useTransactions } from '../context/TransactionContext';
@@ -12,6 +12,17 @@ const TransactionItem = ({ item, onDelete }) => {
     ? (isDarkMode ? '#1B3320' : '#E6F4EA') 
     : (isDarkMode ? '#3C1E1E' : '#FCE8E6');
   const iconColor = isIncome ? '#34A853' : '#EA4335';
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => onDelete(item.id) }
+      ]
+    );
+  };
 
   return (
     <View style={[styles.transactionCard, { backgroundColor: theme.card }]}>
@@ -30,7 +41,7 @@ const TransactionItem = ({ item, onDelete }) => {
         <Text style={[styles.transactionAmount, { color: iconColor }]}>
           {isIncome ? '+' : '-'} {formatCurrency(item.amount)}
         </Text>
-        <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteBtn}>
+        <TouchableOpacity onPress={handleDelete} style={styles.deleteBtn}>
           <Trash2 size={16} color={theme.subText} />
         </TouchableOpacity>
       </View>
