@@ -118,10 +118,24 @@ export const TransactionProvider = ({ children }) => {
       .forEach(t => {
         categories[t.category] = (categories[t.category] || 0) + t.amount;
       });
+      
+    const CATEGORY_COLORS = {
+      'Food': '#FF6B6B', 'Transport': '#4ECDC4', 'Shopping': '#45B7D1',
+      'Bills': '#96CEB4', 'Entertainment': '#F39C12', 'Health': '#D4A5A5',
+      'Housing': '#9B59B6', 'Utilities': '#34495E', 'General': '#95A5A6'
+    };
+
+    const getConsistentColor = (name) => {
+      if (CATEGORY_COLORS[name]) return CATEGORY_COLORS[name];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return '#' + (hash & 0x00FFFFFF).toString(16).padStart(6, '0');
+    };
+
     return Object.keys(categories).map(name => ({
       name,
       amount: categories[name],
-      color: `#${Math.floor(Math.random()*16777215).toString(16)}` // Random color
+      color: getConsistentColor(name)
     }));
   };
 
