@@ -84,7 +84,10 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
     Write-Host "GitHub CLI (gh) detected. Attempting to create and push to a new repository..."
     try {
         # Check auth
-        gh auth status 2>$null
+        gh auth status 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "GitHub authentication failed. Please run 'gh auth login' first."
+        }
         
         # Create repo and push
         gh repo create expense-manager-app --public --source=. --remote=origin --push
