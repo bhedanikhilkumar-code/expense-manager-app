@@ -27,12 +27,12 @@ export const TransactionProvider = ({ children }) => {
           // Default initial data
           const initialData = [
             { id: '1', title: 'Salary', amount: 50000, type: 'income', category: 'Salary', date: new Date().toISOString() },
-            { id: '2', title: 'Grocery', amount: 2500, type: 'expense', category: 'Food', date: new Date().toISOString() },
-            { id: '3', title: 'Petrol', amount: 1200, type: 'expense', category: 'Transport', date: new Date().toISOString() },
-            { id: '4', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: new Date().toISOString() },
-            { id: '5', title: 'Internet', amount: 800, type: 'expense', category: 'Utilities', date: new Date().toISOString() },
-            { id: '6', title: 'Gym', amount: 1500, type: 'expense', category: 'Health', date: new Date().toISOString() },
-            { id: '7', title: 'Dining Out', amount: 1200, type: 'expense', category: 'Food', date: new Date().toISOString() },
+            { id: '2', title: 'Grocery', amount: 2500, type: 'expense', category: 'Food', date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+            { id: '3', title: 'Petrol', amount: 1200, type: 'expense', category: 'Transport', date: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString() },
+            { id: '4', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: '5', title: 'Internet', amount: 800, type: 'expense', category: 'Utilities', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: '6', title: 'Gym', amount: 1500, type: 'expense', category: 'Health', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: '7', title: 'Dining Out', amount: 1200, type: 'expense', category: 'Food', date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() },
           ];
           setTransactions(initialData);
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));

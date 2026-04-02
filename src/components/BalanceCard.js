@@ -3,28 +3,36 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TrendingUp, TrendingDown } from 'lucide-react-native';
 import StatItem from './StatItem';
 import { formatCurrency } from '../utils/formatters';
+import { useTransactions } from '../context/TransactionContext';
 
-const BalanceCard = ({ balance, income, expense }) => (
-  <View style={styles.balanceCard}>
-    <Text style={styles.balanceLabel}>Total Balance</Text>
-    <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>
-    
-    <View style={styles.statsRow}>
-      <StatItem 
-        icon={<TrendingUp size={16} color="#1E8E3E" />}
-        label="Income"
-        value={formatCurrency(income)}
-        iconBgColor="#E6F4EA"
-      />
-      <StatItem 
-        icon={<TrendingDown size={16} color="#D93025" />}
-        label="Expense"
-        value={formatCurrency(expense)}
-        iconBgColor="#FCE8E6"
-      />
+const BalanceCard = ({ balance, income, expense }) => {
+  const { theme, isDarkMode } = useTransactions();
+  return (
+    <View style={[styles.balanceCard, { backgroundColor: theme.primary, shadowColor: theme.primary }]}>
+      <Text style={styles.balanceLabel}>Total Balance</Text>
+      <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>
+      
+      <View style={styles.statsRow}>
+        <StatItem 
+          icon={<TrendingUp size={16} color={isDarkMode ? '#81C784' : '#1E8E3E'} />}
+          label="Income"
+          value={formatCurrency(income)}
+          iconBgColor={isDarkMode ? '#1B3320' : '#E6F4EA'}
+          labelColor={isDarkMode ? '#B0B0B0' : 'rgba(255, 255, 255, 0.7)'}
+          valueColor={isDarkMode ? '#E0E0E0' : '#FFF'}
+        />
+        <StatItem 
+          icon={<TrendingDown size={16} color={isDarkMode ? '#E57373' : '#D93025'} />}
+          label="Expense"
+          value={formatCurrency(expense)}
+          iconBgColor={isDarkMode ? '#3C1E1E' : '#FCE8E6'}
+          labelColor={isDarkMode ? '#B0B0B0' : 'rgba(255, 255, 255, 0.7)'}
+          valueColor={isDarkMode ? '#E0E0E0' : '#FFF'}
+        />
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   balanceCard: {

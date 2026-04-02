@@ -20,10 +20,12 @@ const AddTransactionScreen = ({ navigation }) => {
   };
 
   const handleSave = () => {
-    if (!title || !amount) return;
+    if (!title.trim() || !amount) return;
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) return;
     addTransaction({
-      title,
-      amount: parseFloat(amount),
+      title: title.trim(),
+      amount: parsedAmount,
       type,
       category,
     });

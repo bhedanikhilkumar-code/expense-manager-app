@@ -25,7 +25,7 @@ const AnalyticsChart = () => {
                   styles.progressBarFill, 
                   { 
                     width: `${percentage}%`, 
-                    backgroundColor: theme.primary 
+                    backgroundColor: item.color
                   }
                 ]} 
               />
