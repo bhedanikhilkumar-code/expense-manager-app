@@ -16,6 +16,7 @@
     },
     "android": {
       "package": "com.bhedanikhilkumar.expensemanager",
+      "jsEngine": "jsc",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

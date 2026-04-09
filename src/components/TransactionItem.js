@@ -6,12 +6,12 @@ import { useTransactions } from '../context/TransactionContext';
 
 const TransactionItem = ({ item, onDelete }) => {
   const { theme, isDarkMode } = useTransactions();
-  
+    
   const isIncome = item.type === 'income';
   const iconBg = isIncome 
-    ? (isDarkMode ? '#1B3320' : '#E6F4EA') 
-    : (isDarkMode ? '#3C1E1E' : '#FCE8E6');
-  const iconColor = isIncome ? '#34A853' : '#EA4335';
+    ? (isDarkMode ? 'rgba(52, 168, 83, 0.15)' : 'rgba(52, 168, 83, 0.1)') 
+    : (isDarkMode ? 'rgba(234, 67, 53, 0.15)' : 'rgba(234, 67, 53, 0.1)');
+  const iconColor = isIncome ? theme.income : theme.expense;
 
   const handleDelete = () => {
     Alert.alert(
@@ -25,15 +25,15 @@ const TransactionItem = ({ item, onDelete }) => {
   };
 
   return (
-    <View style={[styles.transactionCard, { backgroundColor: theme.card }]}>
+    <View style={[styles.transactionCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
       <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
-        {isIncome ? <TrendingUp size={20} color={iconColor} /> : <TrendingDown size={20} color={iconColor} />}
+        {isIncome ? <TrendingUp size={22} color={iconColor} /> : <TrendingDown size={22} color={iconColor} />}
       </View>
       <View style={styles.transactionDetails}>
-        <Text style={[styles.transactionTitle, { color: theme.text }]}>{item.title}</Text>
+        <Text style={[styles.transactionTitle, { color: theme.text }]} numberOfLines={1}>{item.title}</Text>
         <View style={styles.subInfo}>
           <Text style={[styles.transactionCategory, { color: theme.subText }]}>{item.category}</Text>
-          <Text style={[styles.dot, { color: theme.border }]}> • </Text>
+          <Text style={[styles.dot, { color: theme.subText }]}> • </Text>
           <Text style={[styles.transactionDate, { color: theme.subText }]}>{formatDate(item.date)}</Text>
         </View>
       </View>
@@ -41,7 +41,7 @@ const TransactionItem = ({ item, onDelete }) => {
         <Text style={[styles.transactionAmount, { color: iconColor }]}>
           {isIncome ? '+' : '-'} {formatCurrency(item.amount)}
         </Text>
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteBtn}>
+        <TouchableOpacity onPress={handleDelete} style={[styles.deleteBtn, { backgroundColor: theme.background }]}>
           <Trash2 size={16} color={theme.subText} />
         </TouchableOpacity>
       </View>
@@ -50,25 +50,24 @@ const TransactionItem = ({ item, onDelete }) => {
 };
 
 const styles = StyleSheet.create({
-  transactionCard: { 
-    backgroundColor: '#FFF', 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    padding: 16, 
-    borderRadius: 16, 
-    marginBottom: 12, 
-    elevation: 1 
+  transactionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 1,
   },
-  iconContainer: { padding: 12, borderRadius: 14, marginRight: 16 },
+  iconContainer: { padding: 12, borderRadius: 14, marginRight: 14 },
   transactionDetails: { flex: 1 },
-  transactionTitle: { fontSize: 16, fontWeight: '600', color: '#202124' },
-  subInfo: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
-  transactionCategory: { fontSize: 12, color: '#70757A' },
-  dot: { fontSize: 12, color: '#DADCE0' },
-  transactionDate: { fontSize: 12, color: '#70757A' },
+  transactionTitle: { fontSize: 16, fontWeight: '600' },
+  subInfo: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  transactionCategory: { fontSize: 12 },
+  dot: { fontSize: 12 },
+  transactionDate: { fontSize: 12 },
   rightContent: { alignItems: 'flex-end' },
   transactionAmount: { fontSize: 16, fontWeight: 'bold' },
-  deleteBtn: { marginTop: 4, padding: 4 },
+  deleteBtn: { marginTop: 8, padding: 8, borderRadius: 10 },
 });
 
 export default TransactionItem;

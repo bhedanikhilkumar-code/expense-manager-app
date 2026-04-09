@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { ChevronLeft, Save } from 'lucide-react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, StatusBar } from 'react-native';
+import { ChevronLeft, Save, Calculator } from 'lucide-react-native';
 import { useTransactions } from '../context/TransactionContext';
 
 const EXPENSE_CATEGORIES = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'General'];
@@ -36,51 +36,51 @@ const AddTransactionScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={theme.background} />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: theme.card }]}>
-            <ChevronLeft size={28} color={theme.text} />
+          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <ChevronLeft size={24} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: theme.text }]}>Add Transaction</Text>
           <View style={{ width: 40 }} />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.form}>
-            <Text style={[styles.label, { color: theme.subText }]}>Transaction Type</Text>
-            <View style={[styles.typeContainer, { backgroundColor: theme.card }]}>
-              <TouchableOpacity 
-                style={[
-                  styles.typeButton, 
-                  type === 'expense' && (isDarkMode ? { backgroundColor: '#3C1E1E' } : styles.activeExpense)
-                ]}
-                onPress={() => handleTypeChange('expense')}
-              >
-                <Text style={[
-                  styles.typeText, 
-                  { color: type === 'expense' ? theme.expense : theme.subText }
-                ]}>Expense</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[
-                  styles.typeButton, 
-                  type === 'income' && (isDarkMode ? { backgroundColor: '#1B3320' } : styles.activeIncome)
-                ]}
-                onPress={() => handleTypeChange('income')}
-              >
-                <Text style={[
-                  styles.typeText, 
-                  { color: type === 'income' ? theme.income : theme.subText }
-                ]}>Income</Text>
-              </TouchableOpacity>
-            </View>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.typeToggle, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <TouchableOpacity 
+              style={[
+                styles.typeBtn, 
+                type === 'expense' && { backgroundColor: theme.expense }
+              ]}
+              onPress={() => handleTypeChange('expense')}
+            >
+              <Text style={[
+                styles.typeBtnText, 
+                { color: type === 'expense' ? '#FFF' : theme.subText }
+              ]}>Expense</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[
+                styles.typeBtn, 
+                type === 'income' && { backgroundColor: theme.income }
+              ]}
+              onPress={() => handleTypeChange('income')}
+            >
+              <Text style={[
+                styles.typeBtnText, 
+                { color: type === 'income' ? '#FFF' : theme.subText }
+              ]}>Income</Text>
+            </TouchableOpacity>
+          </View>
 
-            <Text style={[styles.label, { color: theme.subText }]}>Amount</Text>
-            <View style={[styles.inputWrapper, { borderBottomColor: theme.primary }]}>
-              <Text style={[styles.currencySymbol, { color: theme.text }]}>₹</Text>
+          <View style={[styles.amountCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[styles.amountLabel, { color: theme.subText }]}>Amount (₹)</Text>
+            <View style={styles.amountInputRow}>
+              <Text style={[styles.currencySymbol, { color: theme.primary }]}>₹</Text>
               <TextInput
                 style={[styles.amountInput, { color: theme.text }]}
                 placeholder="0"
@@ -88,47 +88,54 @@ const AddTransactionScreen = ({ navigation }) => {
                 keyboardType="numeric"
                 value={amount}
                 onChangeText={setAmount}
-                autoFocus
               />
             </View>
+          </View>
 
-            <Text style={[styles.label, { color: theme.subText }]}>Category</Text>
-            <View style={styles.categoryContainer}>
-              {categories.map((cat) => (
-                <TouchableOpacity
-                  key={cat}
-                  style={[
-                    styles.categoryChip,
-                    { backgroundColor: theme.card },
-                    category === cat && (type === 'expense' ? (isDarkMode ? { backgroundColor: '#3C1E1E' } : styles.chipActiveExpense) : (isDarkMode ? { backgroundColor: '#1B3320' } : styles.chipActiveIncome))
-                  ]}
-                  onPress={() => setCategory(cat)}
-                >
-                  <Text style={[
-                    styles.categoryChipText, 
-                    { color: theme.subText },
-                    category === cat && { color: type === 'expense' ? theme.expense : theme.income, fontWeight: 'bold' }
-                  ]}>
-                    {cat}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Category</Text>
+          <View style={styles.categoryGrid}>
+            {categories.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                style={[
+                  styles.categoryCard,
+                  { backgroundColor: theme.card, borderColor: category === cat ? (type === 'expense' ? theme.expense : theme.income) : theme.border },
+                  category === cat && { borderWidth: 2 }
+                ]}
+                onPress={() => setCategory(cat)}
+              >
+                <Text style={[
+                  styles.categoryText, 
+                  { color: category === cat ? (type === 'expense' ? theme.expense : theme.income) : theme.subText }
+                ]}>
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-            <Text style={[styles.label, { color: theme.subText }]}>What was it for?</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Description</Text>
+          <View style={[styles.inputCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <TextInput
-              style={[styles.titleInput, { borderBottomColor: theme.border, color: theme.text }]}
-              placeholder="e.g. Dinner, Rent, Bonus"
+              style={[styles.titleInput, { color: theme.text }]}
+              placeholder="What was this for?"
               placeholderTextColor={theme.subText}
               value={title}
               onChangeText={setTitle}
             />
-
-            <TouchableOpacity style={[styles.saveButton, { backgroundColor: theme.primary }]} onPress={handleSave}>
-              <Save size={20} color="#FFF" style={{ marginRight: 10 }} />
-              <Text style={styles.saveButtonText}>Save Transaction</Text>
-            </TouchableOpacity>
           </View>
+
+          <TouchableOpacity 
+            style={[
+              styles.saveButton, 
+              { backgroundColor: theme.primary, opacity: (!title.trim() || !amount) ? 0.5 : 1 }
+            ]} 
+            onPress={handleSave}
+            disabled={!title.trim() || !amount}
+          >
+            <Save size={22} color="#FFF" style={{ marginRight: 10 }} />
+            <Text style={styles.saveButtonText}>Save Transaction</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -136,30 +143,27 @@ const AddTransactionScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 },
-  backButton: { padding: 8, backgroundColor: '#F1F3F4', borderRadius: 12 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#202124' },
-  form: { padding: 24, flex: 1 },
-  label: { fontSize: 14, fontWeight: '600', color: '#5F6368', marginBottom: 10, marginTop: 20 },
-  typeContainer: { flexDirection: 'row', backgroundColor: '#F1F3F4', borderRadius: 16, padding: 4 },
-  typeButton: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
-  typeText: { fontSize: 16, fontWeight: '600', color: '#5F6368' },
-  activeExpense: { backgroundColor: '#FCE8E6' },
-  activeIncome: { backgroundColor: '#E6F4EA' },
-  activeTypeText: { color: '#202124' },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 2, borderBottomColor: '#1A73E8', paddingBottom: 8 },
-  currencySymbol: { fontSize: 32, fontWeight: 'bold', color: '#202124', marginRight: 8 },
-  amountInput: { fontSize: 40, fontWeight: 'bold', color: '#202124', flex: 1 },
-  categoryContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  categoryChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#F1F3F4' },
-  chipActiveExpense: { backgroundColor: '#FCE8E6' },
-  chipActiveIncome: { backgroundColor: '#E6F4EA' },
-  categoryChipText: { fontSize: 14, color: '#5F6368', fontWeight: '500' },
-  categoryChipTextActive: { color: '#202124' },
-  titleInput: { fontSize: 18, borderBottomWidth: 1, borderBottomColor: '#DADCE0', paddingVertical: 12, color: '#202124' },
-  saveButton: { backgroundColor: '#1A73E8', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 18, borderRadius: 16, marginTop: 40, marginBottom: 20, elevation: 4 },
-  saveButtonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  container: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 15 },
+  backButton: { padding: 10, borderRadius: 12, borderWidth: 1 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold' },
+  scrollContent: { padding: 20 },
+  typeToggle: { flexDirection: 'row', borderRadius: 16, padding: 4, borderWidth: 1, marginBottom: 20 },
+  typeBtn: { flex: 1, paddingVertical: 14, alignItems: 'center', borderRadius: 12 },
+  typeBtnText: { fontSize: 16, fontWeight: '700' },
+  amountCard: { padding: 20, borderRadius: 20, borderWidth: 1, marginBottom: 24 },
+  amountLabel: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+  amountInputRow: { flexDirection: 'row', alignItems: 'center' },
+  currencySymbol: { fontSize: 36, fontWeight: 'bold', marginRight: 8 },
+  amountInput: { fontSize: 42, fontWeight: 'bold', flex: 1 },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 12, marginTop: 8 },
+  categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 },
+  categoryCard: { paddingHorizontal: 18, paddingVertical: 12, borderRadius: 12, borderWidth: 1, minWidth: '30%', alignItems: 'center' },
+  categoryText: { fontSize: 14, fontWeight: '600' },
+  inputCard: { padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 24 },
+  titleInput: { fontSize: 16 },
+  saveButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 18, borderRadius: 16, marginBottom: 30 },
+  saveButtonText: { fontSize: 18, fontWeight: 'bold', color: '#FFF' },
 });
 
 export default AddTransactionScreen;

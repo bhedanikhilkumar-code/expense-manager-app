@@ -14,10 +14,10 @@ const StatItem = ({ icon, label, value, iconBgColor, valueColor = '#FFF', labelC
 );
 
 const styles = StyleSheet.create({
-  statItem: { flexDirection: 'row', alignItems: 'center' },
-  statIconWrapper: { padding: 8, borderRadius: 12, marginRight: 10 },
-  statLabel: { color: 'rgba(255, 255, 255, 0.7)', fontSize: 12 },
-  statValue: { fontSize: 16, fontWeight: '600' },
+  statItem: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  statIconWrapper: { padding: 10, borderRadius: 12, marginRight: 12 },
+  statLabel: { fontSize: 12, fontWeight: '500' },
+  statValue: { fontSize: 16, fontWeight: '700', marginTop: 2 },
 });
 
 export default StatItem;

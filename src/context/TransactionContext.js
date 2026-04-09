@@ -98,26 +98,26 @@ export const TransactionProvider = ({ children }) => {
     });
   };
 
-  const filteredData = getFilteredTransactions();
+   const filteredData = getFilteredTransactions();
 
-  const totalIncome = filteredData
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+   const totalIncome = transactions
+     .filter(t => t.type === 'income')
+     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-  const totalExpense = filteredData
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+   const totalExpense = transactions
+     .filter(t => t.type === 'expense')
+     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-  const balance = totalIncome - totalExpense;
+   const balance = totalIncome - totalExpense;
 
-  // Spending by category (for chart)
-  const getSpendingByCategory = () => {
-    const categories = {};
-    filteredData
-      .filter(t => t.type === 'expense')
-      .forEach(t => {
-        categories[t.category] = (categories[t.category] || 0) + t.amount;
-      });
+   // Spending by category (for chart)
+   const getSpendingByCategory = () => {
+     const categories = {};
+     filteredData
+       .filter(t => t.type === 'expense')
+       .forEach(t => {
+         categories[t.category] = (categories[t.category] || 0) + t.amount;
+       });
       
     const CATEGORY_COLORS = {
       'Food': '#FF6B6B', 'Transport': '#4ECDC4', 'Shopping': '#45B7D1',
